@@ -1,0 +1,549 @@
+{% extends "base.html" %} {% block title %}Level Test{% endblock %} {% block
+content %}
+
+<!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Read & Speak Korean Dashboard</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+            
+        <!-- Info boxes -->
+        <div class="row">
+
+          <div class="col-12 col-sm-6 col-md-3">
+
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">E-mail</span>
+                <span class="info-box-number">
+                  {{ user.email }}
+                </span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-cog"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Username</span>
+                <span class="info-box-number">{{ user.first_name }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-key"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Password</span>
+                <span class="info-box-number">{{ user.password[0:7]+"..(Encrypted)" }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-medal"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Latest Score</span>
+                {% if No_entity == True %}
+                  <span class="info-box-number">-</span>
+                {% else %}
+                  <span class="info-box-number">{{ latest_score }} /100</span>
+                {% endif %}
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title">Smart Score Board </h5>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown">
+                      <i class="fas fa-wrench"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" role="menu">
+                      <a href="#" class="dropdown-item">Action</a>
+                      <a href="#" class="dropdown-item">Another action</a>
+                      <a href="#" class="dropdown-item">Something else here</a>
+                      <a class="dropdown-divider"></a>
+                      <a href="#" class="dropdown-item">Separated link</a>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-8">
+                    
+
+                    <div class="chart">
+                      <!-- Sales Chart Canvas -->
+                      <div id="chartContainer" style="height: 200px; width: 100%;"></div>
+                    </div>
+                    <!-- /.chart-responsive -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-md-4">
+                    <p class="text-center">
+                      <strong>Current Status</strong>
+                    </p>
+
+                    <div class="progress-group">
+                      Korean Learning Progress
+                      {% if No_entity == True %}
+                        <span class="float-right"><b>0 </b>/100</span>
+                        <div class="progress progress-sm">
+                          <div class="progress-bar bg-primary" style="width: 0%"></div>
+                        </div>
+                      {% else %}
+                        <span class="float-right"><b>100 </b>/100</span>
+                        <div class="progress progress-sm">
+                          <div class="progress-bar bg-primary" style="width: 100%"></div>
+                        </div>
+                      {% endif %}
+
+                    </div>
+                    <!-- /.progress-group -->
+
+                    <div class="progress-group">
+                      Correct Answers (Percentage)
+                      <span class="float-right"><b>{{ correct }}</b> /100</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-danger" style="width: {{ correct }}%"></div>
+                      </div>
+                    </div>
+
+                    <!-- /.progress-group -->
+                    <div class="progress-group">
+                      <span class="progress-text">Incorrect Answers (Percentage)</span>
+                      <span class="float-right"><b>{{ incorrect }}</b> /100</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" style="width: {{ incorrect }}%"></div>
+                      </div>
+                    </div>
+
+                    <!-- /.progress-group -->
+                    <div class="progress-group">
+                      Average Score
+                      <span class="float-right"><b>{{ average_score }} </b>/100</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-warning" style="width: {{ average_score }}%"></div>
+                      </div>
+                    </div>
+                    <!-- /.progress-group -->
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- ./card-body -->
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col-sm-3 col-6">
+                    <div class="description-block border-right">
+                      
+                      <span class="description-percentage text-success"><i class="fas fa-caret-up"></i> 17%</span>
+                      {% if No_entity == True %}
+                        <h5 class="description-header">0</h5>
+                      {% else %}
+                        <h5 class="description-header">100</h5>
+                      {% endif %}
+                      <span class="description-text">Korean Learning Progress</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-3 col-6">
+                    <div class="description-block border-right">
+                      <span class="description-percentage text-warning"><i class="fas fa-caret-left"></i> 0%</span>
+                      <h5 class="description-header">{{ correct_raw }}</h5>
+                      <span class="description-text">Correct Answers</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-3 col-6">
+                    <div class="description-block border-right">
+                      <span class="description-percentage text-success"><i class="fas fa-caret-up"></i> 20%</span>
+                      <h5 class="description-header">{{ incorrect_raw }}</h5>
+                      <span class="description-text">Incorrect Answers</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-3 col-6">
+                    <div class="description-block">
+                      <span class="description-percentage text-danger"><i class="fas fa-caret-down"></i> 18%</span>
+                      <h5 class="description-header">-</h5>
+                      <span class="description-text">Predicted Score</span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        <!-- Main row -->
+        <div class="row">
+          <!-- Left col -->
+          <div class="col-md-8">
+            <!-- MAP & BOX PANE -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">World Map</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body p-0">
+                
+                <div class="d-md-flex">
+                  <div class="p-1 flex-fill" style="overflow: hidden">
+                    <!-- Map will be created here -->
+                    <div id="world-map-markers" style="height: 325px; overflow: hidden">
+                      <div id="chartdiv"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="card-pane-right bg-success pt-2 pb-2 pl-4 pr-4">
+                    
+                    <div class="description-block mb-4">
+                      <div class="sparkbar pad" data-color="#FF0000" style="property:powderblue;"><h4>THE HALL OF FAME<br><br></h4></div>
+                      <span class="description-text">HIGHEST SCORE</span>
+                      <h5 class="description-header" style="property:powderblue;"><h4>{{ Higest_Score }}</h4></h5>
+                      
+                    </div>
+                    <!-- /.description-block -->
+                    <div class="description-block mb-4">
+                      <div class="sparkbar pad" data-color="#fff"></div>
+                      <span class="description-text">USERNAME</span>
+                      <h3 class="description-header">{{ Higest_Score_User_listx }}</h3>
+                      
+                    </div>
+                    <!-- /.description-block -->
+                    <div class="description-block">
+                      <div class="sparkbar pad" data-color="#fff"></div>
+                      <h5 class="description-header"><h5><br>YOU ARE THE ONE<br>OF LEARNING KOREAN!!</h5>
+                      <span class="description-text"></span>
+                    </div>
+                    <!-- /.description-block -->
+                  </div><!-- /.card-pane-right -->
+                </div><!-- /.d-md-flex -->
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            <div class="row">
+              <div class="col-md-6">
+                <!-- DIRECT CHAT -->
+                
+                <!--/.direct-chat -->
+              </div>
+              <!-- /.col -->
+
+              <div class="col-md-6">
+                <!-- USERS LIST -->
+                
+                <!--/.card -->
+              </div>
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+
+            <!-- TABLE: LATEST ORDERS -->
+            
+            <div class="card">
+              <div class="card-header border-transparent">
+                <h3 class="card-title">Score Board</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table m-0">
+                    <thead>
+                    <tr>
+                      <th>Number</th>
+                      <th>Username</th>
+                      <th>Status</th>
+                      <th>Score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if No_entity_2 == True %}
+                      <tr>
+                        <td>
+                          <div style="">There aren't enough members to draw the table.</div>
+                        </td>
+                      </tr>
+                    {% else %}
+                      <tr>
+                        <td><a href="#">{{ s[-1].id }}</a></td>
+                        <td>{{ users[s[-1].user_id-1].first_name }}</td>
+                        <td><span class="badge badge-pill badge-success">Success</span></td>
+                        <td>
+                          <div class="sparkbar" data-color="#00a65a" data-height="20">{{ s[-1].data }} /100</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><a href="#">{{ s[-2].id }}</a></td>
+                        <td>{{ users[s[-2].user_id-1].first_name }}</td>
+                        <td><span class="badge badge-pill badge-success">Success</span></td>
+                        <td>
+                          <div class="sparkbar" data-color="#f39c12" data-height="20">{{ s[-2].data }} /100</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><a href="#">{{ s[-3].id }}</a></td>
+                        <td>{{ users[s[-3].user_id-1].first_name }}</td>
+                        <td><span class="badge badge-pill badge-success">Success</span></td>
+                        <td>
+                          <div class="sparkbar" data-color="#f56954" data-height="20">{{ s[-3].data }} /100</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><a href="#">{{ s[-4].id }}</a></td>
+                        <td>{{ users[s[-4].user_id-1].first_name }}</td>
+                        <td><span class="badge badge-pill badge-success">Success</span></td>
+                        <td>
+                          <div class="sparkbar" data-color="#00c0ef" data-height="20">{{ s[-4].data }} /100</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><a href="#">{{ s[-5].id }}</a></td>
+                        <td>{{ users[s[-5].user_id-1].first_name }}</td>
+                        <td><span class="badge badge-pill badge-success">Success</span></td>
+                        <td>
+                          <div class="sparkbar" data-color="#f39c12" data-height="20">{{ s[-5].data }} /100</div>
+                        </td>
+                      </tr>
+                
+                    {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.table-responsive -->
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer clearfix">
+                <a href="javascript:void(0)" class="btn btn-sm btn-info float-left">Place New Order</a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-secondary float-right">View All Orders</a>
+              </div>
+              <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-4">
+                          <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Personal Notes</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <ul class="products-list product-list-in-card pl-2 pr-2">
+                    <li class="item">
+                      
+                      <div class="product-info">
+                        
+                        <span class="product-description">
+                          *This is a note section. Leave any word to begin*
+                        </span>
+                      </div>
+                    </li>
+                    <!-- /.item -->
+                    {% for note in user.notes %}
+                      <li class="item">
+                        
+                          <div class="product-info">
+                            
+                            <span class="product-description">
+                              {{ note.data }}, 
+                              {{ note.date }}
+                                        
+                            </span>
+                            
+                          </div>
+                        
+                      </li>
+                    {% endfor %}
+                    <!-- /.item -->
+                    
+                    
+                  </ul>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer text-center">
+                  <a href="/notes" class="uppercase">Write New Notes</a>
+                </div>
+                <!-- /.card-footer -->
+              </div>
+              <!-- /.card -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">User Analysis</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="chart-responsive">
+                        <div id="donutchart" style="width: 350px; height: 300px; "></div>
+                      </div>
+                      <!-- ./chart-responsive -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-4">
+                      <ul class="chart-legend clearfix">
+                        <li><i class="far fa-circle text-primary"></i> Beginner</li>
+                        <li><i class="far fa-circle text-warning"></i> Intermediate</li>
+                        <li><i class="far fa-circle text-danger"></i> Advanced</li>
+                        
+                        
+                      </ul>
+                    </div>
+                    <!-- /.col -->
+                  </div>
+                  <!-- /.row -->
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer p-0">
+                  <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        Beginner
+                        <span class="float-right text-danger">
+                          <i class="fas fa-arrow-down text-sm"></i>
+                          12%</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        Intermediate
+                        <span class="float-right text-success">
+                          <i class="fas fa-arrow-up text-sm"></i> 4%
+                        </span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="#" class="nav-link">
+                        Advanced
+                        <span class="float-right text-warning">
+                          <i class="fas fa-arrow-left text-sm"></i> 0%
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <!-- /.footer -->
+              </div>
+              <!-- /.card -->
+            </div>
+            <!-- /.info-box -->
+
+
+            
+
+            
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!--/. container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}

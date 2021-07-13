@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Read & Speak Korean Dashboard{% endblock %}</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+  
+  
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='./css/OverlayScrollbars.min.css') }}">
+  
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='./css/adminlte.min.css') }}">
+  <!-- fullCalendar -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='./css/main.css') }}">
+  
+
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.stock.min.js"></script>
+  <script type="text/javascript">
+  window.onload = function () {  
+    var stockChart = new CanvasJS.StockChart("chartContainer",{
+      theme: "dark2",
+      title:{
+      text:"Leveltest Score Chart"
+    },
+      animationEnabled: true,
+      exportEnabled: true,
+      charts: [{
+        axisX: {
+          crosshair: {
+            enabled: true,
+            snapToDataPoint: true
+          }
+        },
+        axisY: {
+          crosshair: {
+            enabled: true,
+            //snapToDataPoint: true
+          }
+        },
+        data: data
+      }],    
+      rangeSelector: {
+        inputFields: {
+          startValue: 4000,
+          endValue: 6000,
+          valueFormatString: "###0"
+        },
+        
+        buttons: [{
+          label: "1000",
+          range: 1000,
+          rangeType: "number"
+        },{
+          label: "2000",
+          range: 2000,
+          rangeType: "number"
+        },{
+          label: "5000",
+          range: 5000,
+          rangeType: "number"
+        },{
+          label: "All",        
+          rangeType: "all"
+        }]
+      }
+    });
+
+    stockChart.render();    
+  }
+
+  var limit = 10000;    //increase number of dataPoints by increasing this
+  var y = 10;
+  var data = []; var dataSeries = { type: "spline" };
+  var dataPoints = [];
+  
+
+  
+  i=0
+  {% if No_entity == True %}
+    dataPoints.push({ x: i, y: 0 });
+  {% else %}
+    {% for n in user.scores %}
+      i = i+1;
+      
+      y = {{ n.data }};
+      dataPoints.push({ x: i, y: y });
+    {% endfor %}
+  {% endif %}
+
+  
+  dataSeries.dataPoints = dataPoints;
+  data.push(dataSeries);
+  </script>
+
+  <!-- Styles map-------------------------------------------------------------------------------------------------------->
+  <style>
+  #chartdiv {
+    width: 100%;
+    height: 300px;
+  }
+  </style>
+
+  <!-- Resources -->
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/geodata/data/countries2.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+  <!-- Chart code -->
+  <script>
+  am4core.ready(function() {
+
+  // Themes begin
+  am4core.useTheme(am4themes_animated);
+  // Themes end
+
+  var continents = {
+    "AF": 0,
+    "AN": 1,
+    "AS": 2,
+    "EU": 3,
+    "NA": 4,
+    "OC": 5,
+    "SA": 6
+  }
+
+  // Create map instance
+  var chart = am4core.create("chartdiv", am4maps.MapChart);
+  chart.projection = new am4maps.projections.Miller();
+
+  // Create map polygon series for world map
+  var worldSeries = chart.series.push(new am4maps.MapPolygonSeries());
+  worldSeries.useGeodata = true;
+  worldSeries.geodata = am4geodata_worldLow;
+  worldSeries.exclude = ["AQ"];
+
+  var worldPolygon = worldSeries.mapPolygons.template;
+  worldPolygon.tooltipText = "{name}";
+  worldPolygon.nonScalingStroke = true;
+  worldPolygon.strokeOpacity = 0.5;
+  worldPolygon.fill = am4core.color("#eee");
+  worldPolygon.propertyFields.fill = "color";
+
+  var hs = worldPolygon.states.create("hover");
+  hs.properties.fill = chart.colors.getIndex(9);
+
+
+  // Create country specific series (but hide it for now)
+  var countrySeries = chart.series.push(new am4maps.MapPolygonSeries());
+  countrySeries.useGeodata = true;
+  countrySeries.hide();
+  countrySeries.geodataSource.events.on("done", function(ev) {
+    worldSeries.hide();
+    countrySeries.show();
+  });
+
+  var countryPolygon = countrySeries.mapPolygons.template;
+  countryPolygon.tooltipText = "{name}";
+  countryPolygon.nonScalingStroke = true;
+  countryPolygon.strokeOpacity = 0.5;
+  countryPolygon.fill = am4core.color("#eee");
+
+  var hs = countryPolygon.states.create("hover");
+  hs.properties.fill = chart.colors.getIndex(9);
+
+  // Set up click events
+  worldPolygon.events.on("hit", function(ev) {
+    ev.target.series.chart.zoomToMapObject(ev.target);
+    var map = ev.target.dataItem.dataContext.map;
+    if (map) {
+      ev.target.isHover = false;
+      countrySeries.geodataSource.url = "https://www.amcharts.com/lib/4/geodata/json/" + map + ".json";
+      countrySeries.geodataSource.load();
+    }
+  });
+
+  // Set up data for countries
+  var data = [];
+  for(var id in am4geodata_data_countries2) {
+    if (am4geodata_data_countries2.hasOwnProperty(id)) {
+      var country = am4geodata_data_countries2[id];
+      if (country.maps.length) {
+        data.push({
+          id: id,
+          color: chart.colors.getIndex(continents[country.continent_code]),
+          map: country.maps[0]
+        });
+      }
+    }
+  }
+  worldSeries.data = data;
+
+  // Zoom control
+  chart.zoomControl = new am4maps.ZoomControl();
+
+  var homeButton = new am4core.Button();
+  homeButton.events.on("hit", function() {
+    worldSeries.show();
+    countrySeries.hide();
+    chart.goHome();
+  });
+
+  homeButton.icon = new am4core.Sprite();
+  homeButton.padding(7, 5, 7, 5);
+  homeButton.width = 30;
+  homeButton.icon.path = "M16,8 L14,8 L14,16 L10,16 L10,10 L6,10 L6,16 L2,16 L2,8 L0,8 L8,0 L16,8 Z M16,8";
+  homeButton.marginBottom = 10;
+  homeButton.parent = chart.zoomControl;
+  homeButton.insertBefore(chart.zoomControl.plusButton);
+
+  }); // end am4core.ready()
+  </script>
+
+  <!--- PIE CHART________________________-_________________________________________________________________________--->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ['Task', 'Hours per Day'],
+        ['Beginner',     11],
+        ['Advanced',      2],
+        ['Intermediate',  2]
+      ]);
+
+      var options = {
+        pieHole: 0.4,
+        backgroundColor: '#36393e',
+        legend: 'none'
+        
+        
+      };
+
+      var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+      chart.draw(data, options);
+    }
+  </script>
+    
+</head>
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+<body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+
+  
+
+  <div class="wrapper">
+
+    <!-- Preloader -->
+    <div class="preloader flex-column justify-content-center align-items-center">
+      <img class="animation__shake" src="{{ url_for('static', filename='./img/SKR_logo.jpg') }}" alt="AdminLTELogo" height="60" width="60">
+      
+    </div>  
+    
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-dark">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        {% if user.is_authenticated %}
+        <a class="nav-item nav-link" id="home" href="/">Home</a>
+        <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+        <a class="nav-item nav-link" id="leveltest" href="/leveltest">Leveltest</a>
+        <a class="nav-item nav-link" id="discord" href="https://discord.gg/JsZfNMTPVf">Discord</a>
+        {% else %}
+        <a class="nav-item nav-link" id="login" href="/login">Login</a>
+        <a class="nav-item nav-link" id="signUp" href="/sign-up">SignUp</a>
+        <a class="nav-item nav-link" id="discord" href="https://discord.gg/JsZfNMTPVf">Discord</a>
+        {% endif %}
+      </ul>
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <!-- Navbar Search -->
+        <li class="nav-item">
+          <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+            <i class="fas fa-search"></i>
+          </a>
+          <div class="navbar-search-block">
+            <form class="form-inline">
+              <div class="input-group input-group-sm">
+                <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                  <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                  </button>
+                  <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </li>
+
+        <!-- Messages Dropdown Menu -->
+        <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="far fa-comments"></i>
+            
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <a href="#" class="dropdown-item">
+              <!-- Message Start -->
+              <div class="media">
+                <img src="{{ url_for('static', filename='./img/user1-128x128.jpg') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                
+                <div class="media-body">
+                  <h3 class="dropdown-item-title">
+                    Brad Diesel
+                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                  </h3>
+                  <p class="text-sm">Call me whenever you can...</p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                </div>
+              </div>
+              <!-- Message End -->
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <!-- Message Start -->
+              <div class="media">
+                <img src="{{ url_for('static', filename='./img/user8-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                
+                <div class="media-body">
+                  <h3 class="dropdown-item-title">
+                    John Pierce
+                    <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                  </h3>
+                  <p class="text-sm">I got your message bro</p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                </div>
+              </div>
+              <!-- Message End -->
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <!-- Message Start -->
+              <div class="media">
+                <img src="{{ url_for('static', filename='./img/user3-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
+                
+                <div class="media-body">
+                  <h3 class="dropdown-item-title">
+                    Nora Silvester
+                    <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                  </h3>
+                  <p class="text-sm">The subject goes here</p>
+                  <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                </div>
+              </div>
+              <!-- Message End -->
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+          </div>
+        </li>
+        <!-- Notifications Dropdown Menu -->
+        <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="far fa-bell"></i>
+            
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">15 Notifications</span>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-envelope mr-2"></i> 4 new messages
+              <span class="float-right text-muted text-sm">3 mins</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-users mr-2"></i> 8 friend requests
+              <span class="float-right text-muted text-sm">12 hours</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-file mr-2"></i> 3 new reports
+              <span class="float-right text-muted text-sm">2 days</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+            <i class="fas fa-expand-arrows-alt"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+            <i class="fas fa-th-large"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>  
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="/" class="brand-link">
+        <img src="{{ url_for('static', filename='./img/SKR_logo.jpg') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        
+        <span class="brand-text font-weight-light">Read & Speak Korean</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        {% if user.is_authenticated %}
+          <!-- Sidebar user panel (optional) -->
+          <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+              <img src="{{ url_for('static', filename='./img/user_logo.jpg') }}" class="img-circle elevation-2" alt="User Image">
+              
+            </div>
+            <div class="info">
+              
+                <a href="#" class="d-block">{{ user.email }}</a>
+              
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+          {% if user.is_authenticated %}
+        
+                   
+            <li class="nav-header">MAIN</li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-edit"></i>
+                <p>
+                  Korean Leveltest
+                  <i class="fas fa-angle-left right"></i>
+                  <span class="right badge badge-danger">NEW</span>
+                </p>
+              </a>
+
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="/leveltest" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Beginner</p>
+                    <span class="right badge badge-danger">NEW</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/forms/advanced.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Intermediate-Low(In Progress)</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/forms/editors.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Intermediate-High(In Progress)</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/forms/validation.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Advanced(In Progress)</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="/notes" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Personal Notes
+                  
+                  <span class="right badge badge-danger">NEW</span>
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/calendar" class="nav-link">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>
+                  Calendar
+                  <span class="right badge badge-danger">NEW</span>
+                  
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="pages/gallery.html" class="nav-link">
+                <i class="nav-icon far fa-image"></i>
+                <p>
+                  Gallery(In Progress)
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="pages/kanban.html" class="nav-link">
+                <i class="nav-icon fas fa-columns"></i>
+                <p>
+                  Kanban Board(In Progress)
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon far fa-envelope"></i>
+                <p>
+                  Mailbox(In Progress)
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="pages/mailbox/mailbox.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Inbox</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/mailbox/compose.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Compose</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/mailbox/read-mail.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Read</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Pages(In Progress)
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="pages/examples/invoice.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Invoice</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/profile.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Profile</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/e-commerce.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>E-commerce</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/projects.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Projects</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/project-add.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Project Add</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/project-edit.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Project Edit</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/project-detail.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Project Detail</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/contacts.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Contacts</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/faq.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>FAQ</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/contact-us.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Contact us</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon far fa-plus-square"></i>
+                <p>
+                  Extras(In Progress)
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Login & Register v1
+                      <i class="fas fa-angle-left right"></i>
+                    </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="pages/examples/login.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Login v1</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/register.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Register v1</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/forgot-password.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Forgot Password v1</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/recover-password.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Recover Password v1</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>
+                      Login & Register v2
+                      <i class="fas fa-angle-left right"></i>
+                    </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="pages/examples/login-v2.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Login v2</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/register-v2.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Register v2</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/forgot-password-v2.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Forgot Password v2</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="pages/examples/recover-password-v2.html" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Recover Password v2</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/lockscreen.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Lockscreen</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/legacy-user-menu.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Legacy User Menu</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/language-menu.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Language Menu</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/404.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Error 404</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/500.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Error 500</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/pace.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Pace</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/examples/blank.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Blank Page</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="starter.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Starter Page</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-search"></i>
+                <p>
+                  Search(In Progress)
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="pages/search/simple.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Simple Search</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="pages/search/enhanced.html" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Enhanced</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-header">MISCELLANEOUS</li>
+            <li class="nav-item">
+              <a href="iframe.html" class="nav-link">
+                <i class="nav-icon fas fa-ellipsis-h"></i>
+                <p>Tabbed IFrame Plugin(In Progress)</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="https://adminlte.io/docs/3.1/" class="nav-link">
+                <i class="nav-icon fas fa-file"></i>
+                <p>Documentation(In Progress)</p>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fas fa-circle nav-icon"></i>
+                <p>Level 1(In Progress)</p>
+              </a>
+            </li>
+          {% endif %}   
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>
+    
+    
+
+    
+    <div class="container-fluid">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %} {% if category ==
+      'error' %}
+      
+      <div class="alert alert-danger alter-dismissable fade show" role="alert">
+        <br><br>
+        <div style="text-align: center;">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      {% else %}
+      
+      <div class="alert alert-success alter-dismissable fade show" role="alert">
+        <br><br>
+        <div style="text-align: center;">{{ message }}
+          <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      {% endif %} {% endfor %} {% endif %} {% endwith %}
+      {% block content %} {% endblock %}
+    </div>
+    
+
+
+    
+
+      
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+
+    <!-- Main Footer -->
+    
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- REQUIRED SCRIPTS -->
+  <!-- jQuery -->
+  <script src="{{ url_for('static', filename='./js/jquery.min.js') }}"></script>
+
+  <!-- Bootstrap -->
+  <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- overlayScrollbars -->
+  <script src="{{ url_for('static', filename='./js/jquery.overlayScrollbars.min.js') }}"></script>
+
+  <!-- AdminLTE App -->
+  <script src="{{ url_for('static', filename='./js/adminlte.js') }}"></script>
+
+
+  <!-- PAGE PLUGINS -->
+  <!-- jQuery Mapael -->
+  <script src="{{ url_for('static', filename='./js/jquery.mousewheel.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='./js/raphael.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='./js/jquery.mapael.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='./js/usa_states.min.js') }}"></script>
+
+  <!-- ChartJS -->
+  <script src="{{ url_for('static', filename='./js/Chart.min.js') }}"></script>
+
+
+  <!-- AdminLTE for demo purposes -->
+  <script src="{{ url_for('static', filename='./js/demo.js') }}"></script>
+
+  <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+  <script src="{{ url_for('static', filename='./js/pages/dashboard2.js') }}"></script>
+
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    type="text/javascript"
+    src="{{ url_for('static', filename='index.js') }}"
+  ></script>
+  <!-- jQuery UI -->
+  <script src="{{ url_for('static', filename='./js/jquery-ui.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='./js/moment.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='./js/main.js') }}"></script>
+  <!----------------------------------------------------------calendar--------------------------------->
+  <script>
+    $(function () {
+
+      /* initialize the external events
+      -----------------------------------------------------------------*/
+      function ini_events(ele) {
+        ele.each(function () {
+
+          // create an Event Object (https://fullcalendar.io/docs/event-object)
+          // it doesn't need to have a start or end
+          var eventObject = {
+            title: $.trim($(this).text()) // use the element's text as the event title
+          }
+
+          // store the Event Object in the DOM element so we can get to it later
+          $(this).data('eventObject', eventObject)
+
+          // make the event draggable using jQuery UI
+          $(this).draggable({
+            zIndex        : 1070,
+            revert        : true, // will cause the event to go back to its
+            revertDuration: 0  //  original position after the drag
+          })
+
+        })
+      }
+
+      ini_events($('#external-events div.external-event'))
+
+      /* initialize the calendar
+      -----------------------------------------------------------------*/
+      //Date for the calendar events (dummy data)
+      var date = new Date()
+      var d    = date.getDate(),
+          m    = date.getMonth(),
+          y    = date.getFullYear()
+
+      var Calendar = FullCalendar.Calendar;
+      var Draggable = FullCalendar.Draggable;
+
+      var containerEl = document.getElementById('external-events');
+      var checkbox = document.getElementById('drop-remove');
+      var calendarEl = document.getElementById('calendar');
+
+      // initialize the external events
+      // -----------------------------------------------------------------
+
+      new Draggable(containerEl, {
+        itemSelector: '.external-event',
+        eventData: function(eventEl) {
+          return {
+            title: eventEl.innerText,
+            backgroundColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+            borderColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+            textColor: window.getComputedStyle( eventEl ,null).getPropertyValue('color'),
+          };
+        }
+      });
+
+      var calendar = new Calendar(calendarEl, {
+        headerToolbar: {
+          left  : 'prev,next today',
+          center: 'title',
+          right : 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        themeSystem: 'bootstrap',
+        //Random default events
+        events: [
+          {
+            title          : 'All Day Event',
+            start          : new Date(y, m, 1),
+            backgroundColor: '#f56954', //red
+            borderColor    : '#f56954', //red
+            allDay         : true
+          },
+          {
+            title          : 'Long Event',
+            start          : new Date(y, m, d - 5),
+            end            : new Date(y, m, d - 2),
+            backgroundColor: '#f39c12', //yellow
+            borderColor    : '#f39c12' //yellow
+          },
+          {
+            title          : 'Meeting',
+            start          : new Date(y, m, d, 10, 30),
+            allDay         : false,
+            backgroundColor: '#0073b7', //Blue
+            borderColor    : '#0073b7' //Blue
+          },
+          {
+            title          : 'Lunch',
+            start          : new Date(y, m, d, 12, 0),
+            end            : new Date(y, m, d, 14, 0),
+            allDay         : false,
+            backgroundColor: '#00c0ef', //Info (aqua)
+            borderColor    : '#00c0ef' //Info (aqua)
+          },
+          {
+            title          : 'Birthday Party',
+            start          : new Date(y, m, d + 1, 19, 0),
+            end            : new Date(y, m, d + 1, 22, 30),
+            allDay         : false,
+            backgroundColor: '#00a65a', //Success (green)
+            borderColor    : '#00a65a' //Success (green)
+          },
+          {
+            title          : 'Click for Google',
+            start          : new Date(y, m, 28),
+            end            : new Date(y, m, 29),
+            url            : 'https://www.google.com/',
+            backgroundColor: '#3c8dbc', //Primary (light-blue)
+            borderColor    : '#3c8dbc' //Primary (light-blue)
+          }
+        ],
+        editable  : true,
+        droppable : true, // this allows things to be dropped onto the calendar !!!
+        drop      : function(info) {
+          // is the "remove after drop" checkbox checked?
+          if (checkbox.checked) {
+            // if so, remove the element from the "Draggable Events" list
+            info.draggedEl.parentNode.removeChild(info.draggedEl);
+          }
+        }
+      });
+
+      calendar.render();
+      // $('#calendar').fullCalendar()
+
+      /* ADDING EVENTS */
+      var currColor = '#3c8dbc' //Red by default
+      // Color chooser button
+      $('#color-chooser > li > a').click(function (e) {
+        e.preventDefault()
+        // Save color
+        currColor = $(this).css('color')
+        // Add color effect to button
+        $('#add-new-event').css({
+          'background-color': currColor,
+          'border-color'    : currColor
+        })
+      })
+      $('#add-new-event').click(function (e) {
+        e.preventDefault()
+        // Get value and make sure it is not null
+        var val = $('#new-event').val()
+        if (val.length == 0) {
+          return
+        }
+
+        // Create events
+        var event = $('<div />')
+        event.css({
+          'background-color': currColor,
+          'border-color'    : currColor,
+          'color'           : '#fff'
+        }).addClass('external-event')
+        event.text(val)
+        $('#external-events').prepend(event)
+
+        // Add draggable funtionality
+        ini_events(event)
+
+        // Remove event from text input
+        $('#new-event').val('')
+      })
+    })
+  </script>
+  
+
+</body>
+</html>

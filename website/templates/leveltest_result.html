@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %}Level Test Result{% endblock %} {% block
+content %}
+<div class="container">
+  <div class="content-wrapper">
+    <br><br>
+    <h1>Your score is {{ result }} /100 </h1>
+
+
+    <ul class="list-group list-group-flush" id="notes">
+      {% for n in user.scores %}
+      <li class="list-group-item">
+        {{ n.data }},
+        {{ n.date }}
+        
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+
+{% endblock %}
