@@ -14,7 +14,7 @@ from sqlalchemy import delete
 
 auth = Blueprint('auth', __name__)
 
-
+admin = ['pigeonchicken4@gmail.com']
 
 
 
@@ -38,7 +38,7 @@ def login():
             flash('Email does not exist.', category='error')
     
 
-    return render_template("login.html", user=current_user)
+    return render_template("login.html", user=current_user, admin = admin)
 
 
 @auth.route('/logout')
@@ -193,13 +193,13 @@ def leveltest():
         
 
 
-        return render_template("leveltest_result.html", user=current_user, result = result, scores=scores)
+        return render_template("leveltest_result.html", user=current_user, result = result, scores=scores, admin = admin)
         
        
         
 
 
-  return render_template("leveltest.html", user=current_user)
+  return render_template("leveltest.html", user=current_user, admin = admin)
 
 @auth.route('/leveltest_result', methods=['GET', 'POST'])
 @login_required
@@ -215,7 +215,7 @@ def leveltest_result(result):
           db.session.commit()
           flash('Note added!', category='success')
 
-  return render_template("leveltest_result.html", user=current_user)
+  return render_template("leveltest_result.html", user=current_user, admin = admin)
 
 
 
@@ -234,7 +234,7 @@ def members():
           db.session.commit()
           flash('Note added!', category='success')
   
-  return render_template("members.html", user=current_user, users = users)
+  return render_template("members.html", user=current_user, users = users, admin = admin)
 
 @auth.route('/notes', methods=['GET', 'POST'])
 @login_required
@@ -251,7 +251,7 @@ def notes():
           db.session.commit()
           flash('Note added!', category='success')
   
-  return render_template("notes.html", user=current_user, users = users)
+  return render_template("notes.html", user=current_user, users = users, admin = admin)
 
 @auth.route('/calendar', methods=['GET', 'POST'])
 @login_required
@@ -259,7 +259,7 @@ def calendar():
   users = User.query.all()
 
   
-  return render_template("calendar.html", user=current_user, users = users)
+  return render_template("calendar.html", user=current_user, users = users, admin = admin)
 
 
 

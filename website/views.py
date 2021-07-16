@@ -8,6 +8,8 @@ import math
 
 views = Blueprint('views', __name__)
 
+admin = [ 'pigeonchicken4@gmail.com']
+
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -84,11 +86,11 @@ def home():
     SCORE_LIST = []
 
     for n in SCORE_ALL:
-      
+      n.data = int(n.data)
       SCORE_LIST.append(n.data)
-      sorted(SCORE_LIST)
-    
-
+      
+    print(SCORE_LIST)
+    SCORE_LIST.sort()
     print(SCORE_LIST)
 
     Higest_Score = SCORE_LIST[-1]
@@ -110,12 +112,13 @@ def home():
 
     print(predict(1, y))
 
-
+    for n in admin:
+      print(n)
 
     total_visits_count = visits(1)
     
 
-    return render_template("home.html", user=current_user, users = users, No_entity = No_entity, s=s, average_score = average_score, latest_score=latest_score, No_entity_2=No_entity_2, correct=correct, incorrect=incorrect, correct_raw= correct_raw, incorrect_raw = incorrect_raw, total_visits_count = total_visits_count, Higest_Score = Higest_Score, Higest_Score_User_listx = Higest_Score_User_listx)
+    return render_template("home.html", user=current_user, users = users, No_entity = No_entity, s=s, average_score = average_score, latest_score=latest_score, No_entity_2=No_entity_2, correct=correct, incorrect=incorrect, correct_raw= correct_raw, incorrect_raw = incorrect_raw, total_visits_count = total_visits_count, Higest_Score = Higest_Score, Higest_Score_User_listx = Higest_Score_User_listx, admin = admin)
 
 @views.route('/test', methods=['GET', 'POST'])
 @login_required
