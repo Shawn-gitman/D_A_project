@@ -18,86 +18,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='./css/adminlte.min.css') }}">
   <!-- fullCalendar -->
   <link rel="stylesheet" href="{{ url_for('static', filename='./css/main.css') }}">
-  
-
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.stock.min.js"></script>
-  <script type="text/javascript">
-  window.onload = function () {  
-    var stockChart = new CanvasJS.StockChart("chartContainer",{
-      theme: "dark2",
-      title:{
-      text:"Leveltest Score Chart"
-    },
-      animationEnabled: true,
-      exportEnabled: true,
-      charts: [{
-        axisX: {
-          crosshair: {
-            enabled: true,
-            snapToDataPoint: true
-          }
-        },
-        axisY: {
-          crosshair: {
-            enabled: true,
-            //snapToDataPoint: true
-          }
-        },
-        data: data
-      }],    
-      rangeSelector: {
-        inputFields: {
-          startValue: 4000,
-          endValue: 6000,
-          valueFormatString: "###0"
-        },
-        
-        buttons: [{
-          label: "1000",
-          range: 1000,
-          rangeType: "number"
-        },{
-          label: "2000",
-          range: 2000,
-          rangeType: "number"
-        },{
-          label: "5000",
-          range: 5000,
-          rangeType: "number"
-        },{
-          label: "All",        
-          rangeType: "all"
-        }]
-      }
-    });
-
-    stockChart.render();    
-  }
-
-  var limit = 10000;    //increase number of dataPoints by increasing this
-  var y = 10;
-  var data = []; var dataSeries = { type: "spline" };
-  var dataPoints = [];
-  
 
   
-  i=0
-  {% if No_entity == True %}
-    dataPoints.push({ x: i, y: 0 });
-  {% else %}
-    {% for n in user.scores %}
-      i = i+1;
-      
-      y = {{ n.data }};
-      dataPoints.push({ x: i, y: y });
-    {% endfor %}
-  {% endif %}
 
-  
-  dataSeries.dataPoints = dataPoints;
-  data.push(dataSeries);
-  </script>
+
 
   <!-- Styles map-------------------------------------------------------------------------------------------------------->
   <style>
@@ -110,6 +34,9 @@
   <!-- Resources -->
   <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
   <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+
+
+
   <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
   <script src="https://cdn.amcharts.com/lib/4/geodata/data/countries2.js"></script>
   <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
@@ -219,6 +146,8 @@
   }); // end am4core.ready()
   </script>
 
+
+
   <!--- PIE CHART________________________-_________________________________________________________________________--->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
@@ -227,9 +156,9 @@
     function drawChart() {
       var data = google.visualization.arrayToDataTable([
         ['Task', 'Hours per Day'],
-        ['Beginner',     11],
-        ['Advanced',      2],
-        ['Intermediate',  2]
+        ['Beginner',     {{U_B}}],
+        ['Advanced',      {{U_A}}],
+        ['Intermediate',  {{U_I}}]
       ]);
 
       var options = {
@@ -739,7 +668,8 @@
       })
     })
   </script>
-  
+
+
 
 </body>
 </html>

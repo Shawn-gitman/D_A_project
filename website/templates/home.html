@@ -78,7 +78,13 @@ content %}
               <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-medal"></i></span>
 
               <div class="info-box-content">
-                <span class="info-box-text">Latest Score</span>
+                {% if trial == 1 %}
+                  <span class="info-box-text">Latest Score({{ trial }}st)</span>
+                {% elif trial == 2 %}
+                  <span class="info-box-text">Latest Score({{ trial }}2nd)</span>
+                {% else %}
+                  <span class="info-box-text">Latest Score({{ trial }}th)</span>
+                {% endif %}
                 {% if No_entity == True %}
                   <span class="info-box-number">-</span>
                 {% else %}
@@ -128,6 +134,95 @@ content %}
 
                     <div class="chart">
                       <!-- Sales Chart Canvas -->
+
+                      <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+                      <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.stock.min.js"></script>
+                      <script type="text/javascript">
+                      window.onload = function () {  
+                        var stockChart = new CanvasJS.StockChart("chartContainer",{
+                          theme: "dark2",
+                          title:{
+                          text:"Leveltest Score Chart("+{{trial+1}}+"+: Prediction)"
+                        },
+                          animationEnabled: true,
+                          exportEnabled: true,
+                          charts: [{
+                            axisX: {
+                              crosshair: {
+                                enabled: true,
+                                snapToDataPoint: true
+                              }
+                            },
+                            axisY: {
+                              crosshair: {
+                                enabled: true,
+                                //snapToDataPoint: true
+                              }
+                            },
+                            data: data
+                          }],    
+                          rangeSelector: {
+                            inputFields: {
+                              startValue: 4000,
+                              endValue: 6000,
+                              valueFormatString: "###0"
+                            },
+                            
+                            buttons: [{
+                              label: "1000",
+                              range: 1000,
+                              rangeType: "number"
+                            },{
+                              label: "2000",
+                              range: 2000,
+                              rangeType: "number"
+                            },{
+                              label: "5000",
+                              range: 5000,
+                              rangeType: "number"
+                            },{
+                              label: "All",        
+                              rangeType: "all"
+                            }]
+                          }
+                        });
+
+                        stockChart.render();    
+                      }
+
+                      var limit = 10000;    //increase number of dataPoints by increasing this
+                      var y = 10;
+                      var data = []; var dataSeries = { type: "spline" };
+                      var dataPoints = [];
+                      
+
+                      
+                      i=0
+                      {% if No_entity == True %}
+                        dataPoints.push({ x: i, y: 0 });
+                      {% else %}
+                        {% for n in user.scores %}
+                          i = i+1;
+                          
+                          y = {{ n.data }};
+                          dataPoints.push({ x: i, y: y });
+                        {% endfor %}
+                        {% for x in pp_prediction_list %}
+                          i+=1;
+
+                          y = {{ x[0] }}
+                          
+                          dataPoints.push({ x: i, y: y });
+                        {% endfor %}
+
+                      {% endif %}
+
+                      
+                      dataSeries.dataPoints = dataPoints;
+                      data.push(dataSeries);
+                      </script>
+
+
                       <div id="chartContainer" style="height: 200px; width: 100%;"></div>
                     </div>
                     <!-- /.chart-responsive -->
@@ -156,8 +251,8 @@ content %}
                     <!-- /.progress-group -->
 
                     <div class="progress-group">
-                      Correct Answers (Percentage)
-                      <span class="float-right"><b>{{ correct }}</b> /100</span>
+                      Correct Answers
+                      <span class="float-right"><b>{{ correct }}</b>% /100%</span>
                       <div class="progress progress-sm">
                         <div class="progress-bar bg-danger" style="width: {{ correct }}%"></div>
                       </div>
@@ -165,8 +260,8 @@ content %}
 
                     <!-- /.progress-group -->
                     <div class="progress-group">
-                      <span class="progress-text">Incorrect Answers (Percentage)</span>
-                      <span class="float-right"><b>{{ incorrect }}</b> /100</span>
+                      <span class="progress-text">Incorrect Answers</span>
+                      <span class="float-right"><b>{{ incorrect }}</b>% /100%</span>
                       <div class="progress progress-sm">
                         <div class="progress-bar bg-success" style="width: {{ incorrect }}%"></div>
                       </div>
@@ -224,8 +319,9 @@ content %}
                   <div class="col-sm-3 col-6">
                     <div class="description-block">
                       <span class="description-percentage"><i class="fas fa-caret-up"></i></span>
-                      <h5 class="description-header">-</h5>
-                      <span class="description-text">Predicted Score</span>
+                      <h5 class="description-header">
+                        {{ res_res_prediction_score }}</h5>
+                      <span class="description-text"> Predicted Score</span>
                     </div>
                     <!-- /.description-block -->
                   </div>
@@ -244,6 +340,139 @@ content %}
         <div class="row">
           <!-- Left col -->
           <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Prediction Board</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- /.card-header -->
+              <div class="card-body p-0" style="margin-left:45px; margin-right:45px;"">
+
+                
+                <div class="progress-group">
+                  Predicted Score
+                  {% if No_entity == True %}
+                    <span class="float-right"><b>0 </b>/100</span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: 0%"></div>
+                    </div>
+                  {% else %}
+                    <span class="float-right"><b>{{ res_res_prediction_score }} </b>/100</span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: {{ res_res_prediction_score }}%"></div>
+                    </div>
+                  {% endif %}
+
+                </div>
+                
+                <div class="progress-group">
+                  Predicted Average Score
+                  <span class="float-right"><b>{{ avg_res }}</b> /100</span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-danger" style="width: {{ avg_res }}%"></div>
+                  </div>
+                </div>
+                <div class="progress-group">
+                  <span class="progress-text">Predicted Variance </span>
+                  <span class="float-right"><b>{{ var_final }}</b></span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-success" style="width: {{ var_final }}%"></div>
+                  </div>
+                </div>
+
+                <!-- /.progress-group -->
+                <div class="progress-group">
+                  Predicted Skewness
+                  <span class="float-right"><b>{{ skew_final }} </b></span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-warning" style="width: {{ skew_final }}%"></div>
+                  </div>
+                </div>
+                <div class="progress-group" >
+                  Predicted Kurtosis
+                  {% if No_entity == True %}
+                    <span class="float-right"><b>0</b></span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: 0%"></div>
+                    </div>
+                  {% else %}
+                    <span class="float-right"><b>{{ kurt_final }} </b></span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: {{kurt_final}}%"></div>
+                    </div>
+                  {% endif %}
+
+                </div>
+                <div class="progress-group">
+                  <span class="progress-text">Predicted Standard Deviation </span>
+                  <span class="float-right"><b>{{ std_final }}</b></span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-success" style="width: {{ std_final }}%"></div>
+                  </div>
+                </div>
+
+                <!-- /.progress-group -->
+                <div class="progress-group">
+                  Predicted Minimum Score
+                  <span class="float-right"><b>{{ min_final }} </b>/100</span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-warning" style="width: {{ min_final }}%"></div>
+                  </div>
+                </div>
+                <div class="progress-group" >
+                  Predicted Maximum Score
+                  {% if No_entity == True %}
+                    <span class="float-right"><b>0 </b>/100</span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: 0%"></div>
+                    </div>
+                  {% else %}
+                    <span class="float-right"><b>{{ max_final }} </b>/100</span>
+                    <div class="progress progress-sm">
+                      <div class="progress-bar bg-primary" style="width: {{ max_final }}%"></div>
+                    </div>
+                  {% endif %}
+
+                </div>
+                
+                <div class="progress-group">
+                  Predicted Interqurtile Range(IQR)
+                  <span class="float-right"><b>{{ iqr }}%</b> /100%</span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-danger" style="width: {{ iqr }}%"></div>
+                  </div>
+                </div>
+                <div class="progress-group">
+                  <span class="progress-text">Predicted Covariance </span>
+                  <span class="float-right"><b>{{ covariance }}</b></span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-success" style="width: {{ covariance }}%"></div>
+                  </div>
+                </div>
+
+                <!-- /.progress-group -->
+                <div class="progress-group">
+                  Predicted Pearson Correlation
+                  <span class="float-right"><b>{{ correlation }} </b></span>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-warning" style="width: {{ correlation*100 }}%"></div>
+                  </div>
+                </div>
+                
+                
+                
+              </div>
+              <!-- /.card-body -->
+            </div>
             <!-- MAP & BOX PANE -->
             <div class="card">
               <div class="card-header">
@@ -258,6 +487,7 @@ content %}
                   </button>
                 </div>
               </div>
+              
               <!-- /.card-header -->
               <div class="card-body p-0">
                 
@@ -272,7 +502,7 @@ content %}
                   <div class="card-pane-right bg-success pt-2 pb-2 pl-4 pr-4">
                     
                     <div class="description-block mb-4">
-                      <div class="sparkbar pad" data-color="#FF0000" style="property:powderblue;"><h4>THE HALL OF FAME<br><br></h4></div>
+                      <div class="sparkbar pad" data-color="#FF0000" style="property:powderblue;"><h4>명예의 전당<br><br></h4></div>
                       <span class="description-text">HIGHEST SCORE</span>
                       <h5 class="description-header" style="property:powderblue;"><h4>{{ Higest_Score }}</h4></h5>
                       
@@ -296,6 +526,7 @@ content %}
               </div>
               <!-- /.card-body -->
             </div>
+            
             <!-- /.card -->
             <div class="row">
               <div class="col-md-6">
@@ -329,6 +560,7 @@ content %}
                   </button>
                 </div>
               </div>
+              
               <!-- /.card-header -->
               <div class="card-body p-0">
                 <div class="table-responsive">
@@ -407,7 +639,52 @@ content %}
           </div>
           <!-- /.col -->
 
+          
+
           <div class="col-md-4">
+                          <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Prediction Result</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <ul class="products-list product-list-in-card pl-2 pr-2">
+                    <li class="item" style ="text-align:center;">
+                      
+                      {% if tag == "A" %}
+                        <img class="animation__shake" src="{{ url_for('static', filename='./img/A.png') }}" alt="AdminLTELogo" height="180" width="180">
+                      {% elif tag == "B" %}
+                        <img class="animation__shake" src="{{ url_for('static', filename='./img/B.png') }}" alt="AdminLTELogo" height="180" width="180">
+                      {% elif tag == "C" %}
+                        <img class="animation__shake" src="{{ url_for('static', filename='./img/D.png') }}" alt="AdminLTELogo" height="180" width="180">
+                      {% else %}
+                        <img class="animation__shake" src="{{ url_for('static', filename='./img/C.png') }}" alt="AdminLTELogo" height="180" width="180">
+                      {% endif %}
+                      
+                      
+                    
+                      
+                    </li>
+                    <!-- /.item -->
+                    
+                    <!-- /.item -->
+                    
+                    
+                  </ul>
+                </div>
+                <!-- /.card-body -->
+               
+                <!-- /.card-footer -->
+              </div>
                           <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">Personal Notes</h3>
@@ -424,28 +701,23 @@ content %}
                 <!-- /.card-header -->
                 <div class="card-body p-0">
                   <ul class="products-list product-list-in-card pl-2 pr-2">
-                    <li class="item">
+                    <li class="item" style ="text-align:center;">
                       
-                      <div class="product-info">
+                      
                         
-                        <span class="product-description">
-                          *This is a note section. Leave any word to begin*
-                        </span>
-                      </div>
+                        
+                      *This is a note section. Leave any words to begin*
+                        
+                      
                     </li>
                     <!-- /.item -->
                     {% for note in user.notes %}
-                      <li class="item">
+                      <li class="item" style ="text-align:center;">
                         
-                          <div class="product-info">
-                            
-                            <span class="product-description">
-                              {{ note.data }}, 
-                              {{ note.date }}
-                                        
-                            </span>
-                            
-                          </div>
+                          
+                        {{ note.data }}, 
+                        {{ note.date }}
+      
                         
                       </li>
                     {% endfor %}

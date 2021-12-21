@@ -12,9 +12,9 @@ from sqlalchemy import delete
 
 
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__,template_folder='templates')
 
-admin = ['pigeonchicken4@gmail.com']
+admin = ['pigeonchicken4@gmail.com', 'taegue52@daum.net']
 
 
 
@@ -239,7 +239,7 @@ def members():
 @auth.route('/notes', methods=['GET', 'POST'])
 @login_required
 def notes():
-  users = User.query.all()
+  users = User.query.all() 
   if request.method == 'POST':
       note = request.form.get('note')
 
