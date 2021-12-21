@@ -8,8 +8,8 @@
 ## RSKWP Dependencies
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
-## Linear Regression
-Following code is the implementation of Linear Regression belonging to our platform. 
+## RSKWP Linear Regression
+Following core code is the implementation of Linear Regression belonging to our platform. 
 ```rb
     #Prediction-------------------------------
     score_list = []
