@@ -1,14 +1,14 @@
 # Description of Read-Speak_Korean_Webapp(RSKWP)🚀
-"Read-Speak_Korean_Webapp_Prediction(RSKWP)" is an web application focusing on web prediction employing Linear Regression. If you want to predict scores based on our model, check out the latest repository in Github. Explanation video(KR) of RSKWP is in below and see results at https://www.readandspeak.ml/ 👈 Click!
+"Read-Speak_Korean_Webapp_Prediction(RSKWP)🚀" is an web application focusing on web prediction employing Linear Regression. If you want to predict scores based on our model, check out the latest repository in Github. Explanation video(KR) of RSKWP is in below and see results at https://www.readandspeak.ml/ 👈 Click!
 
 ![Watch the video](dash.png)
 👇Click!👇
 [![Watch the video](p.png)](https://www.canva.com/design/DAEzIHL7dio/AdGFUXZPWOr60XDsQTv72A/view?utm_content=DAEzIHL7dio&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink)
 
-## RSKWP Dependencies
+## RSKWP Dependencies🚀
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
-## RSKWP Linear Regression
+## RSKWP Linear Regression🚀
 Following code is the core of employing Linear Regression belonging to our platform. See View.py for more information.
 ```rb
     #Prediction-------------------------------
@@ -236,7 +236,7 @@ Following code is the core of employing Linear Regression belonging to our platf
     print(U_A)
 ```
 
-## RSKWP Environments and References
+## RSKWP Environments and References🚀
 RSK_Webapp is implemented in(with)
 * Flask
 * HTML, CSS, Javascript 
@@ -252,8 +252,8 @@ RSK_Webapp is implemented in(with)
 
 ![alt text](flow.png)
 
-## RSKWP Implementation
+## RSKWP Implementation🚀
 Try out our web-service registering a membership in https://www.readandspeak.ml/
 
-## Error Detection #1
+## Error Detection #1🚀
 If you face a problem belonging to sql-alchemy we highly advise to report throughout an e-mail. The adress is taegue52@daum.net. 
