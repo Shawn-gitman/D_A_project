@@ -1,5 +1,5 @@
 # Description of Read-Speak_Korean_Webapp
-This is a descrete application from "Read-Speak_Korean_Webapp_Prediction" that focuses on web functionalities. If you want to predict scores based on sqlalchemy, check out my latest repository in Github(Check out the explanation video of RSKW below)
+This is a descrete application from "Read-Speak_Korean_Webapp_Prediction" that focuses on web functionalities. If you want to predict scores based on sqlalchemy, check out my latest repository in Github(Check out the explanation video of RSKW below, See results: https://www.readandspeak.ml/)
 
 [![Watch the video](p.png)](https://www.canva.com/design/DAEzIHL7dio/AdGFUXZPWOr60XDsQTv72A/view?utm_content=DAEzIHL7dio&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink)
 
