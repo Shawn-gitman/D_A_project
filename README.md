@@ -256,4 +256,4 @@ RSK_Webapp is implemented in(with)
 Try out our web-service registering a membership in https://www.readandspeak.ml/
 
 ## Error Detection #1
-If you face a problem belong to sql-alchemy we highly advise to report throughout an e-mail. The adress is taegue52@daum.net. 
+If you face a problem belonging to sql-alchemy we highly advise to report throughout an e-mail. The adress is taegue52@daum.net. 
