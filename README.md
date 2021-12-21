@@ -1,6 +1,8 @@
 # Description of Read-Speak_Korean_Webapp
 This is a descrete application from "Read-Speak_Korean_Webapp_Prediction" that focuses on web functionalities. If you want to predict scores based on sqlalchemy, check out my latest repository in Github. 
 
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/vt5fpE0bzSY)
+
 ## Dependencies
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
