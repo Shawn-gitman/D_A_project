@@ -7,7 +7,7 @@ This is a descrete application from "Read-Speak_Korean_Webapp_Prediction" that f
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
 ## Environment(Reference)
-RSK_Webapp is implemented in or with
+RSK_Webapp is implemented in(with)
 * Flask
 * HTML, CSS, Javascript 
 * Numpy, Scipy
