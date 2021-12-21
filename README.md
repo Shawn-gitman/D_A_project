@@ -8,6 +8,12 @@
 ## RSKWP Dependencies
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
+## Linear Regression
+Following code is the implementation of Linear Regression belonging to our platform. 
+```rb
+# path/to/your/file.rb
+```
+
 ## RSKWP Environments and References
 RSK_Webapp is implemented in(with)
 * Flask
