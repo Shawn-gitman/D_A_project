@@ -5,18 +5,18 @@ This is a descrete application from "Read-Speak_Korean_Webapp_Prediction" that f
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
 
 ## Environment
-RSK_Webapp is implemented in 
-Flask
-HTML, CSS, Javascript 
-Numpy, Scipy
-Sqlalchemy
-werkzeug.sercurity
-Replit
-Uptimebot
-도메인
-구글 차트
-Canvasjs
-https://adminlte.io/
+RSK_Webapp is implemented in or with
+* Flask
+* HTML, CSS, Javascript 
+* Numpy, Scipy
+* Sqlalchemy
+* werkzeug.sercurity
+* Replit
+* Uptimebot
+* 도메인
+* 구글 차트
+* Canvasjs
+* https://adminlte.io/
 
 ## Implementation
 Check our web-application functionalities registering a membership in https://www.readandspeak.ml/
