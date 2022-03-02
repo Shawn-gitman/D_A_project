@@ -3,7 +3,7 @@
 ![Watch the video](Prediction_main.png)
 ![Watch the video](Prediction_main2.png)
 👇(Watch Video) Click!👇
-[![Watch the video](p.png)](https://www.canva.com/design/DAEzIHL7dio/AdGFUXZPWOr60XDsQTv72A/view?utm_content=DAEzIHL7dio&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink)
+[![Watch the video](p_2.png)](https://www.canva.com/design/DAEzIHL7dio/AdGFUXZPWOr60XDsQTv72A/view?utm_content=DAEzIHL7dio&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink)
 
 ## RSKWP Dependencies🚀
 This application is built in Flask web-framework along with Python. In advance, we recommend to install prerequisites in the command line.
