@@ -3,7 +3,6 @@
 
 * Explanation Video KR @ https://youtu.be/kLSnsNiYaDk (👈 Click!)
 * Explanation Video ENG @ https://youtu.be/n66OKKsGeis (👈 Click!)
-
 ![Watch the video](Prediction_main3.png)
 ![Watch the video](Prediction_main2.png)
 👇(Watch Video) Click!👇
