@@ -250,7 +250,7 @@ RSK_Webapp is implemented in(with)
 * Canvasjs
 * https://adminlte.io/
 
-![alt text](flow.png)
+![alt text](pipeline.png)
 
 ## RSKWP Implementation🚀
 Try out our web-service registering a membership in https://www.readandspeak.ml/
