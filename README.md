@@ -3,6 +3,7 @@
 
 * Explanation Video KR @ https://youtu.be/kLSnsNiYaDk (👈 Click!)
 * Explanation Video ENG @ https://youtu.be/n66OKKsGeis (👈 Click!)
+* Download Presentation PDF @ https://drive.google.com/file/d/18LBc9YjEikHgRpL2hmmoFej0eUM6esmi/view?usp=sharing (👈 Click!)
 
 ![Watch the video](Prediction_main3.png)
 ![Watch the video](Prediction_main2.png)
