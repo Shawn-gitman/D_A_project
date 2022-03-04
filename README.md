@@ -1,5 +1,9 @@
 # Description of Read-Speak_Korean_Webapp(RSKWP)🚀
 "Read-Speak_Korean_Webapp_Prediction(RSKWP)🚀" is a web application focusing on web prediction employing Linear Regression and visualization dashboard. If you want to predict scores based on our model, check out the latest repository in Github. See results at https://www.readandspeak.ml/ 👈 Click!
+
+* Explanation Video KR @ https://youtu.be/kLSnsNiYaDk (👈 Click!)
+* Explanation Video ENG @ https://youtu.be/n66OKKsGeis (👈 Click!)
+
 ![Watch the video](Prediction_main3.png)
 ![Watch the video](Prediction_main2.png)
 👇(Watch Video) Click!👇
